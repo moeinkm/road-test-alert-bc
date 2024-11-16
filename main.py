@@ -6,7 +6,8 @@ import logging
 setup_logging()
 logger = logging.getLogger(__name__)
 
-if __name__ == "__main__":
+
+def main():
     # Step 1: Find available dates
     availability_finder = AvailabilityFinder()
     availability_finder.find_available_dates()
@@ -22,3 +23,11 @@ if __name__ == "__main__":
         gmail_service.send_message(message)
     else:
         logger.info("No available dates found.")
+
+
+if __name__ == "__main__":
+    main()
+
+
+def lambda_handler(event, context):
+    main()
