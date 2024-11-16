@@ -58,3 +58,7 @@ coverage.xml
 
 # Logs and Debugging
 debug.log
+
+# email credentials
+credentials.json
+token.json
