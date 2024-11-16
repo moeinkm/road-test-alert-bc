@@ -62,3 +62,6 @@ debug.log
 # email credentials
 credentials.json
 token.json
+
+# deployment package folder
+.icbc-lambda-package/

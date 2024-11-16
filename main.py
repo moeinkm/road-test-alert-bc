@@ -27,7 +27,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
-def lambda_handler(event, context):
-    main()
