@@ -10,6 +10,7 @@ google-auth = "*"
 google-auth-oauthlib = "*"
 google-api-python-client = "*"
 python-dotenv = "*"
+boto3 = "*"
 
 [dev-packages]
 

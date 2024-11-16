@@ -1,16 +1,100 @@
 import os
 import base64
 import logging
+from abc import ABC, abstractmethod
 from email.mime.text import MIMEText
+
+import boto3
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
+
 from config import Config
 
 
 logger = logging.getLogger(__name__)
+
+
+class BaseTokenHandler(ABC):
+    def __init__(self):
+        self.credentials_path = None
+        self.token_path = None
+
+    @abstractmethod
+    def load_credentials(self):
+        pass
+
+    @abstractmethod
+    def save_token(self, creds):
+        pass
+
+
+class LocalTokenHandler(BaseTokenHandler):
+    def __init__(self):
+        super().__init__()
+        self.credentials_path = 'credentials.json'
+        self.token_path = 'token.json'
+
+    def load_credentials(self):
+        if os.path.exists(self.token_path):
+            creds = Credentials.from_authorized_user_file(self.token_path, ['https://www.googleapis.com/auth/gmail.send'])
+            return creds
+        return None
+
+    def save_token(self, creds):
+        with open(self.token_path, 'w') as token_file:
+            token_file.write(creds.to_json())
+
+
+class LambdaTokenHandler(BaseTokenHandler):
+    def __init__(self):
+        super().__init__()
+        self.s3 = boto3.client('s3')
+        self.bucket_name = os.getenv('TOKEN_BUCKET')
+        self.credentials_key = os.getenv('CREDENTIALS_KEY', 'credentials.json')
+        self.token_key = os.getenv('TOKEN_KEY', 'token.json')
+        self.credentials_path = '/tmp/credentials.json'
+        self.token_path = '/tmp/token.json'
+
+    def load_credentials(self):
+        # Download credentials.json from S3
+        if not self.download_from_s3(self.credentials_key, self.credentials_path):
+            logger.error("Unable to download credentials.json from S3. Cannot proceed.")
+            return None
+
+        # Load token if available
+        if self.download_from_s3(self.token_key, self.token_path):
+            creds = Credentials.from_authorized_user_file(self.token_path, ['https://www.googleapis.com/auth/gmail.send'])
+            return creds
+        return None
+
+    def save_token(self, creds):
+        with open(self.token_path, 'w') as token_file:
+            token_file.write(creds.to_json())
+        self.upload_to_s3(self.token_path, self.token_key)
+
+    def download_from_s3(self, s3_key, local_path):
+        try:
+            self.s3.download_file(self.bucket_name, s3_key, local_path)
+            return True
+        except Exception as e:
+            logger.error(f"Error downloading {s3_key} from S3: {e}")
+            return False
+
+    def upload_to_s3(self, local_path, s3_key):
+        try:
+            self.s3.upload_file(local_path, self.bucket_name, s3_key)
+        except Exception as e:
+            logger.error(f"Error uploading {local_path} to S3 as {s3_key}: {e}")
+
+
+def get_token_handler():
+    env = os.getenv('ENVIRONMENT', 'lambda')
+    if env == 'local':
+        return LocalTokenHandler()
+    return LocalTokenHandler()
 
 
 class SendEmail:
@@ -22,21 +106,29 @@ class SendEmail:
     CREDENTIALS_PATH = Config.get_env_variable('CREDENTIALS_PATH')
 
     def __init__(self):
+        self.token_handler = get_token_handler()
         self.service = None
 
     def initialize_service(self):
         """Initialize the Gmail service."""
-        creds = None
-        if os.path.exists(self.TOKEN_PATH):
-            creds = Credentials.from_authorized_user_file(self.TOKEN_PATH, self.SCOPES)
-        if not creds or not creds.valid:
-            if creds and creds.expired and creds.refresh_token:
-                creds.refresh(Request())
+        creds = self.token_handler.load_credentials()
+
+        # Refresh token if expired or run OAuth flow if no valid token exists
+        if creds and creds.expired and creds.refresh_token:
+            creds.refresh(Request())
+            logger.info("Token refreshed successfully.")
+        elif not creds:
+            # Run OAuth flow for local environment only
+            if isinstance(self.token_handler, LocalTokenHandler):
+                flow = InstalledAppFlow.from_client_secrets_file(self.environment.credentials_path, self.SCOPES)
+                creds = flow.run_local_server(port=0)
+                logger.info("New token obtained successfully.")
             else:
-                flow = InstalledAppFlow.from_client_secrets_file(self.CREDENTIALS_PATH, self.SCOPES)
-                creds = flow.run_local_server(port=0, access_type='offline')
-            with open(self.TOKEN_PATH, 'w') as token:
-                token.write(creds.to_json())
+                logger.error("No valid credentials found. Ensure the refresh token is initialized manually.")
+                return
+
+        # Save the updated credentials
+        self.token_handler.save_token(creds)
 
         self.service = build('gmail', 'v1', credentials=creds)
 
