@@ -1,0 +1,60 @@
+# Byte-compiled files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Django specific files
+db.sqlite3
+*.log
+.env
+*.pot
+*.pyc
+media/
+staticfiles/
+
+# Environment and IDE settings
+.venv/
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Virtual environment
+env/
+venv/
+ENV/
+.venv/
+Pipfile
+Pipfile.lock
+
+# Cache and temporary files
+*.mo
+*.swp
+*.bak
+*.tmp
+*.old
+*.orig
+*.~lock.*
+*.sass-cache
+.npm/
+yarn.lock
+
+# Test coverage and reports
+.coverage
+.tox/
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+
+# Deployment files
+*.crt
+*.pem
+*.key
+
+# Logs and Debugging
+debug.log

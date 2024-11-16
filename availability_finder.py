@@ -76,7 +76,8 @@ class AvailabilityFinder:
                                     days=int(os.getenv('CHECK_AVAILABILITY_INTERVAL'))
                                 )
                         ):
-                            self.do_email = True
+                            if date != datetime.datetime.now().date():
+                                self.do_email = True
                             self.available_dates_result[center_name].append({
                                 'date': appointment_date,
                                 'day_of_week': item['appointmentDt'].get('dayOfWeek'),
