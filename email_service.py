@@ -45,7 +45,7 @@ class SendEmail:
             server = smtplib.SMTP(self.SMTP_SERVER, self.SMTP_PORT)
             server.starttls()  # Upgrade the connection to a secure encrypted SSL/TLS connection
             server.login(self.SENDER_EMAIL, self.APP_PASSWORD)
-            server.sendmail(self.SENDER_EMAIL, self.TO_EMAIL, message.as_string())
+            server.sendmail(self.SENDER_EMAIL, self.TO_EMAIL.split(', '), message.as_string())
             server.quit()
             logger.info("Email sent successfully!")
         except Exception as e:
