@@ -211,4 +211,4 @@ credentials.json
 token.json
 service_account.json
 # deployment package folder
-.icbc-lambda-package/
+icbc-lambda-package/
