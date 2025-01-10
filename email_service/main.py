@@ -1,0 +1,28 @@
+from availability_finder import AvailabilityFinder
+from email_service import SendEmail
+from logging_config import setup_logging
+import logging
+
+setup_logging()
+logger = logging.getLogger(__name__)
+
+
+def main():
+    # Step 1: Find available dates
+    availability_finder = AvailabilityFinder()
+    availability_finder.find_available_dates()
+
+    # Step 2: Send an email if there are available dates
+    if availability_finder.do_email:
+        gmail_service = SendEmail()
+        message = gmail_service.create_message(
+            subject="ICBC road test available dates",
+            message_text=availability_finder.available_dates_result
+        )
+        gmail_service.send_message(message)
+    else:
+        logger.info("No available dates found.")
+
+
+if __name__ == "__main__":
+    main()
