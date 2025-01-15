@@ -15,7 +15,6 @@ dist-ssr
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
-../.idea
 .DS_Store
 *.suo
 *.ntvs*
@@ -43,7 +42,9 @@ web/package-lock.json
 /*/coverage
 
 # Editors
-.idea/
+.idea/*
+.idea
+../.idea
 
 # misc
 .env.local
