@@ -9,8 +9,8 @@ class TestCenterBase(BaseModel):
 class TestCenterCreate(TestCenterBase):
     pass
 
-class TestCenter(TestCenterBase):
+class TestCenterResponse(TestCenterBase):
     id: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True

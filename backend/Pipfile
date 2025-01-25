@@ -4,7 +4,7 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-fastapi = "==0.104.1"
+fastapi = "*"
 uvicorn = "==0.24.0"
 sqlalchemy = "==2.0.23"
 psycopg2-binary = "==2.9.9"
@@ -17,6 +17,9 @@ bcrypt = "==4.0.1"
 pydantic = "==2.5.2"
 pydantic-settings = "==2.1.0"
 alembic = "*"
+pytest = "*"
+httpx = "*"
+starlette = "*"
 
 [dev-packages]
 

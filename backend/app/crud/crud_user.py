@@ -1,11 +1,20 @@
-from sqlalchemy.orm import Session
-from app.models.user import User
-from app.schemas.auth import UserCreate
-from app.core.security import get_password_hash, verify_password
 import uuid
+from typing import Type, List, Optional
 
-def get_user_by_email(db: Session, email: str):
+from sqlalchemy.orm import Session
+
+from app.models import User, TestCenter
+from app.schemas import UserCreate
+from app.core.security import get_password_hash, verify_password
+
+
+def get_user_by_email(db: Session, email: str) -> Optional[Type[User]]:
     return db.query(User).filter(User.email.is_(email)).first()
+
+
+def get_test_centers(db: Session, center_ids: List[int]) -> List[Type[TestCenter]]:
+    return db.query(TestCenter).filter(TestCenter.id.in_(center_ids)).all()
+
 
 def create_user(db: Session, user: UserCreate):
     db_user = User(
@@ -17,7 +26,9 @@ def create_user(db: Session, user: UserCreate):
     db.add(db_user)
     db.commit()
     db.refresh(db_user)
+
     return db_user
+
 
 def authenticate_user(db: Session, email: str, password: str):
     user = get_user_by_email(db, email)

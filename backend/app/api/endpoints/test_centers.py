@@ -1,13 +1,14 @@
 from typing import List
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from app.crud.crud_test_center import get_test_centers
 from app.db.session import get_db
-from app.schemas.test_center import TestCenter
+from app.models import TestCenter
+from app.schemas import TestCenterResponse
 
 router = APIRouter()
 
-@router.get("/", response_model=List[TestCenter])
+@router.get("/", response_model=List[TestCenterResponse])
 def read_test_centers(db: Session = Depends(get_db)):
-    test_centers = get_test_centers(db)
+    test_centers = db.query(TestCenter).all()
+
     return test_centers
