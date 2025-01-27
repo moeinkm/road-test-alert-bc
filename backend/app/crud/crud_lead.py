@@ -9,7 +9,7 @@ from app.models import TestCenter, Lead, UserPreference
 
 
 def get_lead_by_email(db: Session, email: str) -> Type[Lead] | None:
-    return db.query(Lead).filter(Lead.email.is_(email)).first()
+    return db.query(Lead).filter(Lead.email == email).first()
 
 
 

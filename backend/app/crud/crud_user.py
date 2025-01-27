@@ -9,7 +9,7 @@ from app.core.security import get_password_hash, verify_password
 
 
 def get_user_by_email(db: Session, email: str) -> Optional[Type[User]]:
-    return db.query(User).filter(User.email.is_(email)).first()
+    return db.query(User).filter(User.email == email).first()
 
 
 def get_test_centers(db: Session, center_ids: List[int]) -> List[Type[TestCenter]]:

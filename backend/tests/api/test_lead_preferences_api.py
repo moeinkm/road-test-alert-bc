@@ -9,7 +9,7 @@ from app.models import Lead
 
 class TestUserPreferencesAPI:
 
-    def test_submit_form_success(self, client: TestClient, db_session: Session, test_centers):
+    def test_submit_form_success(self, client: TestClient, db: Session, test_centers):
         payload = {
             "lead": {
                 "email": "test@example.com"
@@ -28,10 +28,10 @@ class TestUserPreferencesAPI:
         assert "id" in data
 
         # Verify that the lead was actually created in the database
-        created_lead = db_session.query(Lead).filter(Lead.email.is_("test@example.com")).first()
+        created_lead = db.query(Lead).filter(Lead.email == "test@example.com").first()
         assert created_lead is not None
 
-    def test_submit_form_duplicate_email(self, client: TestClient, db_session: Session, existing_lead):
+    def test_submit_form_duplicate_email(self, client: TestClient, db: Session, existing_lead):
         payload = {
             "lead": {
                 "email": "existing@example.com"
@@ -46,7 +46,7 @@ class TestUserPreferencesAPI:
         response = client.post(f"{settings.API_V1_STR}/lead/create", json=payload)
         assert response.status_code == 409
 
-    def test_submit_form_invalid_center_ids(self, client: TestClient, db_session: Session):
+    def test_submit_form_invalid_center_ids(self, client: TestClient, db: Session):
         payload = {
             "lead": {
                 "email": "test@example.com"

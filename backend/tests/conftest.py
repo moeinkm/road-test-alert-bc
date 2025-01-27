@@ -20,7 +20,7 @@ engine = create_engine(
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 @pytest.fixture(scope="function")
-def db_session():
+def db():
     Base.metadata.create_all(bind=engine)
     session = TestingSessionLocal()
     try:
@@ -30,33 +30,33 @@ def db_session():
         Base.metadata.drop_all(bind=engine)
 
 @pytest.fixture(scope="function")
-def client(db_session):
+def client(db):
     def override_get_db():
         try:
-            yield db_session
+            yield db
         finally:
-            db_session.close()
+            db.close()
 
     app.dependency_overrides[get_db] = override_get_db
     with TestClient(app) as test_client:
         yield test_client
 
 @pytest.fixture(scope="function")
-def test_centers(db_session):
+def test_centers(db):
     centers = [
         TestCenter(name="Center 1", apos_id=69, address="69 Poshti Street", city="No Town"),
         TestCenter(name="Center 2", apos_id=85, address="85 Poshti Alley", city="Shahre No"),
         TestCenter(name="Center 3", apos_id=6985, address="Addresse Pedaret", city="Mahalle Zendegi Pedaret"),
     ]
-    db_session.add_all(centers)
-    db_session.commit()
+    db.add_all(centers)
+    db.commit()
 
     return centers
 
 @pytest.fixture(scope="function")
-def existing_lead(db_session):
+def existing_lead(db):
     lead = Lead(email="existing@example.com")
-    db_session.add(lead)
-    db_session.commit()
+    db.add(lead)
+    db.commit()
 
     return lead

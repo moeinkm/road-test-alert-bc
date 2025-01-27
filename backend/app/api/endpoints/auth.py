@@ -12,14 +12,14 @@ router = APIRouter()
 
 @router.post("/signup", response_model=UserResponse)
 def signup(user_in: UserCreate, db: Session = Depends(get_db)):
-    db_user = db.query(User).filter(User.email.is_(str(user_in.email))).first() # todo: get or create new user
+    db_user = db.query(User).filter(User.email == user_in.email).first() # todo: get or create new user
     if db_user:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
             detail="Email already registered"
         )
     created_user = crud_user.create_user(db=db, user=user_in)
-    lead = db.query(Lead).filter(Lead.email.is_(user_in.email)).first()
+    lead = db.query(Lead).filter(Lead.email == user_in.email).first()
     if lead and lead.user_id is None:
         lead.user_id = created_user.id
         db.commit()
