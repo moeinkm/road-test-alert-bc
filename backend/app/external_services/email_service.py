@@ -32,7 +32,7 @@ class SMTPGmailService:
 
     def create_message(self, subject, message, from_header, subtype='html'):
         """Create an email message."""
-        msg = MIMEMultipart('alternative') # todo
+        msg = MIMEMultipart('alternative') # todo: what is subtype
         msg['Subject'] = subject
         msg['From'] = f'{from_header}{self.sender_email}'
         msg['To'] = self.to_emails

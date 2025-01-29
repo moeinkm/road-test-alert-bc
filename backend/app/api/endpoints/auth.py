@@ -3,7 +3,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from app.core.security import create_access_token
 from app.db.session import get_db
-from app.crud import crud_user
+from app.crud import crud_user, crud_lead
 from app.models import User
 from app.models.user import Lead
 from app.schemas import Token, UserCreate, UserResponse
@@ -19,11 +19,6 @@ def signup(user_in: UserCreate, db: Session = Depends(get_db)):
             detail="Email already registered"
         )
     created_user = crud_user.create_user(db=db, user=user_in)
-    lead = db.query(Lead).filter(Lead.email == user_in.email).first()
-    if lead and lead.user_id is None:
-        lead.user_id = created_user.id
-        db.commit()
-        db.refresh(lead)
 
     return created_user
 

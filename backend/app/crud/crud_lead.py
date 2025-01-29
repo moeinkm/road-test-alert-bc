@@ -12,7 +12,6 @@ def get_lead_by_email(db: Session, email: str) -> Type[Lead] | None:
     return db.query(Lead).filter(Lead.email == email).first()
 
 
-
 def create_lead(db: Session, lead_in: LeadCreate) -> Lead:
     new_lead = Lead(email=lead_in.email)
     db.add(new_lead)

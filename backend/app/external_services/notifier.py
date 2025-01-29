@@ -1,4 +1,4 @@
-from availability_finder import AvailabilityFinder
+from app.external_services.availability_finder import AvailabilityFinder
 
 from app.core.config import settings
 from app.external_services.email_service import SMTPGmailService

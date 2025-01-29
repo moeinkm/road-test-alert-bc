@@ -3,7 +3,7 @@ from typing import Type, List, Optional
 
 from sqlalchemy.orm import Session
 
-from app.models import User, TestCenter
+from app.models import User, TestCenter, Lead
 from app.schemas import UserCreate
 from app.core.security import get_password_hash, verify_password
 
@@ -23,9 +23,18 @@ def create_user(db: Session, user: UserCreate):
         full_name=user.full_name,
         hashed_password=get_password_hash(user.password)
     )
+    
+    lead = db.query(Lead).filter(Lead.email == db_user.email).first()
+    if not lead:
+        lead = Lead(email=db_user.email)
+        db.add(lead)
+    
+    lead.user_id = db_user.id
+    
     db.add(db_user)
     db.commit()
     db.refresh(db_user)
+    db.refresh(lead)
 
     return db_user
 
