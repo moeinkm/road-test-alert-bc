@@ -10,7 +10,6 @@ from logging_config import setup_logging
 import logging
 # todo: import structure
 # todo: write test for this file. Test if dates are inclusive
-# todo: refactor this file to work with center id
 # todo: refactor this file to send email asynchronous
 
 setup_logging()
