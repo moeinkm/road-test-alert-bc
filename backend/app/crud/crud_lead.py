@@ -1,7 +1,8 @@
-from typing import Type
+from typing import Type, List
 
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
+from sqlalchemy import func
 
 from app.crud.crud_user import get_test_centers
 from app.schemas import LeadCreate, UserPreferenceCreate
@@ -56,3 +57,35 @@ def create_lead_with_preference(db: Session, lead_in: LeadCreate, preferences: U
     db.refresh(new_preference, ['lead', 'preferred_centers'])
 
     return new_preference
+
+def get_lead_preferences(db: Session) -> List[dict]:
+    query = db.query(
+        Lead.email,
+        func.array_agg(TestCenter.id).label('preferred_centers'),
+        UserPreference.start_date,
+        UserPreference.end_date
+    ).join(UserPreference, Lead.id == UserPreference.lead_id)\
+     .join(UserPreference.preferred_centers)\
+     .group_by(Lead.email, UserPreference.start_date, UserPreference.end_date)
+
+    return query.all()
+
+
+def get_lead_preference_to_filter_for_email(db: Session) -> List[dict]:
+    lead_preferences = get_lead_preferences(db)
+    return _transform_preferences(lead_preferences)
+
+
+def _transform_preferences(raw_preferences: List[dict]) -> List[dict]:
+    """
+    Transforms raw query results into a structured dictionary format.
+    """
+    return [
+        {
+            'email': email,
+            'preferred_locations': preferred_centers,
+            'start_date': start_date.isoformat(),
+            'end_date': end_date.isoformat()
+        }
+        for email, preferred_centers, start_date, end_date in raw_preferences
+    ]

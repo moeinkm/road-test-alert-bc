@@ -9,6 +9,7 @@ class Settings(BaseSettings):
     ALGORITHM: str
     API_V1_STR: str = '/api/v1'
     DATABASE_URL: str
+    TEST_DATABASE_URL: str
     PROJECT_NAME: str
     SECRET_KEY: str
 

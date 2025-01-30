@@ -1,3 +1,4 @@
+import uuid
 from datetime import date
 from typing import List
 
@@ -10,7 +11,7 @@ class LeadCreate(BaseModel):
     email: EmailStr
 
 class LeadResponse(BaseModel):
-    id: int
+    id: uuid.UUID
     email: EmailStr
 
     class Config:
@@ -30,7 +31,7 @@ class UserPreferenceCreate(BaseModel):
 
 
 class UserPreferenceResponse(BaseModel):
-    id: int
+    id: uuid.UUID
     lead: LeadResponse
     start_date: date
     end_date: date

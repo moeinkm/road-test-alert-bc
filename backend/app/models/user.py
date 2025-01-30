@@ -1,22 +1,23 @@
 import uuid
 
-from sqlalchemy import Column, String, Boolean, DateTime, Integer, ForeignKey, Table
+from sqlalchemy import Column, String, Boolean, DateTime, Integer, ForeignKey, Table, Date
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
+from sqlalchemy.dialects.postgresql import UUID
 from app.db.base import Base
 
 
 user_preferences_centers = Table(
     'user_preferences_centers',
     Base.metadata,
-    Column('user_preference_id', String, ForeignKey('user_preferences.id')),
+    Column('user_preference_id', UUID, ForeignKey('user_preferences.id')),
     Column('test_center_id', Integer, ForeignKey('test_centers.id'))
 )
 
 class User(Base):
     __tablename__ = "users"
 
-    id = Column(String, primary_key=True, default=uuid.uuid4)
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     email = Column(String, unique=True, index=True, nullable=False)
     full_name = Column(String)
     hashed_password = Column(String, nullable=False)
@@ -32,9 +33,9 @@ class User(Base):
 class Lead(Base):
     __tablename__ = "leads"
 
-    id = Column(String, primary_key=True, index=True, default=uuid.uuid4)
+    id = Column(UUID(as_uuid=True), primary_key=True, index=True, default=uuid.uuid4)
     email = Column(String, index=True, nullable=False)
-    user_id = Column(String, ForeignKey("users.id"), nullable=True)
+    user_id = Column(UUID, ForeignKey("users.id"), nullable=True)
 
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(
@@ -49,10 +50,10 @@ class Lead(Base):
 class UserPreference(Base):
     __tablename__ = "user_preferences"
 
-    id = Column(String, primary_key=True, index=True, default=uuid.uuid4)
-    lead_id = Column(String, ForeignKey("leads.id"), nullable=False)
-    start_date = Column(DateTime(timezone=True))
-    end_date = Column(DateTime(timezone=True))
+    id = Column(UUID(as_uuid=True), primary_key=True, index=True, default=uuid.uuid4)
+    lead_id = Column(UUID, ForeignKey("leads.id"), nullable=False)
+    start_date = Column(Date)
+    end_date = Column(Date)
 
     preferred_centers = relationship("TestCenter", secondary=user_preferences_centers,
                                      back_populates="user_preferences")
