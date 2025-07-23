@@ -1,5 +1,7 @@
 from pydantic_settings import BaseSettings
 
+ENV_FILE_PATH = ".env"
+
 
 class Settings(BaseSettings):
     ENVIRONMENT: str
@@ -29,14 +31,16 @@ class Settings(BaseSettings):
     # Google Account credentials
     APP_PASSWORD: str
 
-    # Script configuration
-    CHECK_AVAILABILITY_INTERVAL: int  # Check for availability within this many days
-
     # Google API User ID (generally 'me' for the authorized user)
     GMAIL_USER_ID: str
 
+    # ICBC URLs
+    ICBC_LOGIN_URL: str
+    ICBC_APPOINTMENT_URL: str
+    ICBC_TEST_CENTERS_LOCATION_URL: str
+
     class Config:
-        env_file = ".env"
+        env_file = ENV_FILE_PATH
 
 
 # Load settings once

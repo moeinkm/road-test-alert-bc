@@ -14,14 +14,18 @@ python-multipart = "==0.0.6"
 email-validator = "==2.1.0"
 python-dotenv = "==1.0.0"
 bcrypt = "==4.0.1"
-pydantic = "==2.5.2"
+pydantic = "~=2.11"
 pydantic-settings = "==2.1.0"
 alembic = "*"
 pytest = "*"
 httpx = "*"
 starlette = "*"
+requests = "*"
+pytest-snapshot = "*"
+pytest-cov = "*"
 
 [dev-packages]
+notebook = "*"
 
 [requires]
-python_version = "3.10"
+python_version = "3.12"

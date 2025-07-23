@@ -1,0 +1,1 @@
+{"detail": [{"type": "value_error", "loc": ["body", "preferences"], "msg": "Value error, end_date must be after start_date", "input": {"start_date": "1997-02-24", "end_date": "1997-02-17", "preferred_centers_ids": [], "preferred_days": [0, 2]}, "ctx": {"error": {}}}]}

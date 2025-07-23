@@ -1,10 +1,11 @@
+from calendar import Day
 import uuid
 from datetime import date
 from typing import List
 
 from pydantic import BaseModel, model_validator, EmailStr
 
-from .test_center import TestCenterResponse
+from .center import CenterResponse
 
 
 class LeadCreate(BaseModel):
@@ -22,6 +23,7 @@ class UserPreferenceCreate(BaseModel):
     start_date: date
     end_date: date
     preferred_centers_ids: List[int]
+    preferred_days: List[Day]
 
     @model_validator(mode='after')
     def check_dates(self):
@@ -35,7 +37,8 @@ class UserPreferenceResponse(BaseModel):
     lead: LeadResponse
     start_date: date
     end_date: date
-    preferred_centers: List[TestCenterResponse]
+    preferred_centers: List[CenterResponse]
+    preferred_days: List[Day]
 
     class Config:
         from_attributes = True

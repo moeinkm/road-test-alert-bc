@@ -1,17 +1,18 @@
-import logging
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 import smtplib
 
 from app.core.config import settings
+from .logging_config import setup_logging
 
-logger = logging.getLogger(__name__)
+
+logger = setup_logging(__name__, log_file="email_service.log")
 
 
 class SMTPGmailService:
     SMTP_SERVER = settings.SMTP_SERVER
     SMTP_PORT = settings.SMTP_PORT
-    
+
     def __init__(self, app_password: str, sender_email: str, to_emails: str):
         """
         Initialize the SendEmail class with SMTP server connection and login.
@@ -51,7 +52,7 @@ class SMTPGmailService:
         except Exception as e:
             logger.error(f"Failed to send message: {e}")
             raise e
-    
+
     def close_connection(self):
         """Close the SMTP connection."""
         self.server.quit()

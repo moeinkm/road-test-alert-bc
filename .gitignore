@@ -124,6 +124,7 @@ target/
 
 # Jupyter Notebook
 .ipynb_checkpoints
+.ipynb
 
 # IPython
 profile_default/
@@ -213,3 +214,8 @@ token.json
 service_account.json
 # deployment package folder
 icbc-lambda-package/
+notebooks/
+
+# cursor
+.specstory
+.cursorindexingignore

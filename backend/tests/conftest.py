@@ -8,9 +8,10 @@ from app.core.config import settings
 from app.db.base import Base
 from app.main import app
 from app.db.session import get_db
-from app.models import TestCenter, Lead
+from app.models import Center, Lead
 
-# Create an in-memory SQLite database for testing
+# TODO: Why not model bakery and baker.make?
+# Use an test dedicated database for testing
 SQLALCHEMY_DATABASE_URL = settings.TEST_DATABASE_URL
 
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
@@ -42,11 +43,41 @@ def client(db):
 
 
 @pytest.fixture(scope="function")
-def test_centers(db):
+def centers(db):
     centers = [
-        TestCenter(id=69, name="Center 1", apos_id=69, address="69 Poshti Street", city="No Town"),
-        TestCenter(id=85, name="Center 2", apos_id=85, address="85 Poshti Alley", city="Shahre No"),
-        TestCenter(id=6985, name="Center 3", apos_id=6985, address="Addresse Pedaret", city="Mahalle Zendegi Pedaret"),
+        Center(
+            id=69,
+            name="Center 1",
+            pos_id=69,
+            address="69 Poshti Street",
+            city="No Town",
+            url="http://sag.sag",
+            postal_code="69",
+            lat=69,
+            lng=69,
+        ),
+        Center(
+            id=85,
+            name="Center 2",
+            pos_id=85,
+            address="85 Poshti Alley",
+            city="Shahre No",
+            url="http://gav.gov",
+            postal_code="85",
+            lat=85,
+            lng=85,
+        ),
+        Center(
+            id=6985,
+            name="Center 3",
+            pos_id=6985,
+            address="Addresse Pedaret",
+            city="Mahalle Zendegi Pedaret",
+            url="http://khar.khar",
+            postal_code="6985",
+            lat=6985,
+            lng=6985,
+        ),
     ]
     db.add_all(centers)
     db.commit()
