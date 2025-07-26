@@ -1,3 +1,4 @@
+from urllib.parse import urljoin
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
@@ -10,7 +11,7 @@ from app.main import app
 from app.db.session import get_db
 from app.models import Center, Lead
 
-# TODO: Why not model bakery and baker.make?
+
 # Use an test dedicated database for testing
 SQLALCHEMY_DATABASE_URL = settings.TEST_DATABASE_URL
 
@@ -92,3 +93,11 @@ def existing_lead(db):
     db.commit()
 
     return lead
+
+
+@pytest.fixture
+def get_url():
+    """Fixture to generate full URL for named endpoints."""
+    def _get_url(name: str) -> str:
+        return urljoin(settings.API_V1_STR, app.url_path_for(name))
+    return _get_url

@@ -9,7 +9,7 @@ from app.schemas import Token, UserCreate, UserResponse
 
 router = APIRouter()
 
-@router.post("/signup", response_model=UserResponse)
+@router.post("/signup", response_model=UserResponse, name="auth:signup")
 def signup(user_in: UserCreate, db: Session = Depends(get_db)):
     db_user = db.query(User).filter(User.email == user_in.email).first() # todo: get or create new user
     if db_user:
@@ -21,7 +21,7 @@ def signup(user_in: UserCreate, db: Session = Depends(get_db)):
 
     return created_user
 
-@router.post("/signin", response_model=Token)
+@router.post("/signin", response_model=Token, name="auth:signin")
 def signin(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     user = crud_user.authenticate_user(db, email=form_data.username, password=form_data.password)
     if not user:

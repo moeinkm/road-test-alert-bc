@@ -1,4 +1,5 @@
 from calendar import Day
+from urllib.parse import urljoin
 import json
 from datetime import datetime, timedelta
 
@@ -8,12 +9,15 @@ from fastapi.testclient import TestClient
 from pydantic import ValidationError
 from sqlalchemy.orm import Session
 
+from app.main import app
 from app.core.config import settings
 from app.schemas import UserPreferenceCreate
 
 
 class TestUserPreferencesAPI:
-    def test_submit_form_success(self, client: TestClient, db: Session, centers):
+    """Test suite for lead preferences endpoints."""
+
+    def test_submit_form_success(self, client: TestClient, db: Session, centers, get_url):
         from app.models import Lead
 
         payload = {
@@ -27,7 +31,7 @@ class TestUserPreferencesAPI:
                 "preferred_days": [Day.MONDAY.value, Day.WEDNESDAY.value]
             }
         }
-        response = client.post(f"{settings.API_V1_STR}/lead/create", json=payload)
+        response = client.post(get_url("lead:create"), json=payload)
         assert response.status_code == 201
         data = response.json()
         assert data["lead"]["email"] == "test@example.com"
@@ -37,7 +41,7 @@ class TestUserPreferencesAPI:
         created_lead = db.query(Lead).filter(Lead.email == "test@example.com").first()
         assert created_lead is not None
 
-    def test_submit_form_duplicate_email(self, client: TestClient, db: Session, existing_lead, snapshot: Snapshot):
+    def test_submit_form_duplicate_email(self, client: TestClient, db: Session, existing_lead, snapshot: Snapshot, get_url):
         payload = {
             "lead": {
                 "email": "existing@example.com"
@@ -49,12 +53,12 @@ class TestUserPreferencesAPI:
                 "preferred_days": [Day.MONDAY.value, Day.WEDNESDAY.value]
             }
         }
-
-        response = client.post(f"{settings.API_V1_STR}/lead/create", json=payload)
+        url = settings.API_V1_STR + get_url("lead:create")
+        response = client.post(get_url("lead:create"), json=payload)
         snapshot.assert_match(json.dumps(response.json()), "test_submit_form_duplicate_email_response")
         assert response.status_code == 409
 
-    def test_submit_form_invalid_center_ids(self, client: TestClient, db: Session, snapshot: Snapshot):
+    def test_submit_form_invalid_center_ids(self, client: TestClient, db: Session, snapshot: Snapshot, get_url):
         payload = {
             "lead": {
                 "email": "test@example.com"
@@ -66,12 +70,11 @@ class TestUserPreferencesAPI:
                 "preferred_days": [Day.MONDAY.value, Day.WEDNESDAY.value]
             }
         }
-
-        response = client.post(f"{settings.API_V1_STR}/lead/create", json=payload)
+        response = client.post(get_url("lead:create"), json=payload)
         snapshot.assert_match(json.dumps(response.json()), "test_submit_form_invalid_center_ids_response")
         assert response.status_code == 400
 
-    def test_submit_form_invalid_dates(self, client: TestClient, snapshot: Snapshot):
+    def test_submit_form_invalid_dates(self, client: TestClient, snapshot: Snapshot, get_url):
         payload = {
             "lead": {
                 "email": "test@example.com"
@@ -83,7 +86,7 @@ class TestUserPreferencesAPI:
                 "preferred_days": [Day.MONDAY.value, Day.WEDNESDAY.value]
             }
         }
-        response = client.post(f"{settings.API_V1_STR}/lead/create", json=payload)
+        response = client.post(get_url("lead:create"), json=payload)
         snapshot.assert_match(json.dumps(response.json()), "test_submit_form_invalid_dates_response")
         assert response.status_code == 422
 

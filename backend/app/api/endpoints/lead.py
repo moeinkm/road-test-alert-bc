@@ -8,6 +8,6 @@ from app.schemas import LeadCreate, UserPreferenceCreate, UserPreferenceResponse
 
 router = APIRouter()
 
-@router.post("/create", response_model=UserPreferenceResponse, status_code=status.HTTP_201_CREATED)
+@router.post("/create", response_model=UserPreferenceResponse, status_code=status.HTTP_201_CREATED, name="lead:create")
 def submit_form(lead: LeadCreate, preferences: UserPreferenceCreate, db: Session = Depends(get_db)):
     return create_lead_with_preference(db, lead, preferences)
