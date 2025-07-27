@@ -18,9 +18,8 @@ def get_centers(db: Session, center_ids: List[int]) -> List[Type[Center]]:
 
 def create_user(db: Session, user: UserCreate):
     db_user = User(
-        id=str(uuid.uuid4()),
+        id=uuid.uuid4(),
         email=user.email,
-        full_name=user.full_name,
         hashed_password=get_password_hash(user.password)
     )
     

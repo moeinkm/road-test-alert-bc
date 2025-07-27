@@ -29,5 +29,5 @@ def signin(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depen
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect email or password"
         )
-    access_token = create_access_token(data={"sub": user.id})
+    access_token = create_access_token(data={"sub": str(user.id)})
     return Token(access_token=access_token, token_type="bearer")
