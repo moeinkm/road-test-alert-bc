@@ -1,3 +1,4 @@
+import os
 from pydantic_settings import BaseSettings
 
 ENV_FILE_PATH = ".env"
@@ -11,6 +12,9 @@ class Settings(BaseSettings):
     ALGORITHM: str
     API_V1_STR: str = '/api/v1'
     DATABASE_URL: str
+    DATABASE_USER: str
+    DATABASE_PASSWORD: str
+    DATABASE_NAME: str
     TEST_DATABASE_URL: str
     PROJECT_NAME: str
     SECRET_KEY: str
